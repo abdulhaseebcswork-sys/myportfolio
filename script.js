@@ -256,6 +256,20 @@ document.addEventListener('DOMContentLoaded', () => {
       desc: "A smart app that helps users compare and convert global time zones easily. Features real-time offset synchronization, offline accessibility, integrated voice assistant support, and automatic daylight saving detection.",
       images: ["time zone.png", "time zone 2.png"],
       tags: ["Flutter", "Timezones API", "Offline Mode", "Voice Assistant"]
+    },
+    {
+      title: "NDSA – Natural Disaster Alert System",
+      date: "2026",
+      desc: "A Blockchain-based IoT smart safety solution that detects potential disasters and provides real-time alerts through a Flutter mobile application. Integrates flame, ultrasonic, and gyroscope sensors to monitor fire, flood, and earthquakes. Instant buzzer and push notifications keep users informed, while Blockchain integration ensures every alert and event is securely and transparently logged for accountability and trust.",
+      images: ["NDSA.jpeg", "NDSA1.jpeg"],
+      tags: ["Flutter", "IoT", "ESP32", "Blockchain", "Real-Time Monitoring"]
+    },
+    {
+      title: "Water Level Detector (WLD)",
+      date: "2026",
+      desc: "An intelligent Water Level Monitoring Alert System designed for automation and safety. Uses an ultrasonic sensor for precision water level detection, with real-time readings displayed on an LCD screen. A buzzer triggers instant audible alerts when thresholds are exceeded, all managed by a microcontroller-based design focused on IoT and practical safety applications.",
+      images: ["WLD.jpeg"],
+      tags: ["IoT", "Ultrasonic Sensor", "Microcontroller", "Automation", "Safety"]
     }
   ];
 
@@ -278,7 +292,7 @@ document.addEventListener('DOMContentLoaded', () => {
         "In addition to app development, I have experience editing documentary-style videos for storytelling on YouTube, allowing me to blend engineering and visual creativity."
       ],
       stats: [
-        { num: "4+", label: "Complex Apps Built" },
+        { num: "6+", label: "Complex Apps Built" },
         { num: "3+", label: "Certifications Earned" }
       ],
       timeline: [
@@ -308,7 +322,9 @@ document.addEventListener('DOMContentLoaded', () => {
       { icon: "fa-solid fa-palette", title: "UI/UX Design", desc: "Designing modern, intuitive layouts with a focus on responsiveness, dark modes, and micro-interactions." },
       { icon: "fa-solid fa-cloud", title: "Firebase Integration", desc: "Integrating cloud services including Cloud Firestore real-time databases and Cloud Storage for assets." },
       { icon: "fa-solid fa-network-wired", title: "REST API Services", desc: "Connecting apps with online databases and RESTful APIs to deliver real-time data synchronization." },
-      { icon: "fa-solid fa-video", title: "Video Editing", desc: "Editing documentary-style story videos, pacing, audio synchronization, and visual effects (Movavi)." }
+      { icon: "fa-solid fa-video", title: "Video Editing", desc: "Editing documentary-style story videos, pacing, audio synchronization, and visual effects (Movavi)." },
+      { icon: "fa-solid fa-microchip", title: "Sensor Integration & Microcontroller Programming", desc: "Working with ESP32, ultrasonic sensors, buzzers, and LCDs for real-time monitoring and alerts. Hands-on embedded systems and IoT hardware expertise." },
+      { icon: "fa-solid fa-cubes", title: "IoT–Mobile App & Blockchain Integration", desc: "Building Flutter apps for real-time IoT dashboards and emergency alerts. Secure event logging using blockchain technology for transparency and reliability." }
     ],
     experience: [
       {
@@ -375,7 +391,15 @@ document.addEventListener('DOMContentLoaded', () => {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_PROJECTS));
       return [...DEFAULT_PROJECTS];
     }
-    return JSON.parse(stored);
+    let parsed = JSON.parse(stored);
+    // Migration: if NDSA or WLD projects are missing, reset to defaults
+    const hasNDSA = parsed.some(p => p.images && p.images.includes('NDSA.jpeg'));
+    const hasWLD = parsed.some(p => p.images && p.images.includes('WLD.jpeg'));
+    if (!hasNDSA || !hasWLD) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_PROJECTS));
+      return [...DEFAULT_PROJECTS];
+    }
+    return parsed;
   }
 
   function saveProjects(projects) {
@@ -401,6 +425,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // Migration: ensure hero.avatar exists
     if (!data.hero.avatar) {
       data.hero.avatar = "haseebimg.jpeg";
+      localStorage.setItem(DATA_STORAGE_KEY, JSON.stringify(data));
+    }
+    // Migration: ensure new IoT/Blockchain skills are present
+    const hasIoTSkill = data.skills && data.skills.some(s => s.title && s.title.includes('Microcontroller'));
+    if (!hasIoTSkill) {
+      data.skills = DEFAULT_DATA.skills;
       localStorage.setItem(DATA_STORAGE_KEY, JSON.stringify(data));
     }
     return data;
