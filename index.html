@@ -285,7 +285,7 @@
           
           <div class="about-stats" id="about-stats-container">
             <div class="glass-card stat-item reveal-item">
-              <span class="stat-num">4+</span>
+              <span class="stat-num">6+</span>
               <p class="stat-label">Complex Apps Built</p>
             </div>
             <div class="glass-card stat-item reveal-item" id="certificates-card" style="cursor:pointer;">
@@ -394,6 +394,22 @@
           </div>
           <h3>Video Editing</h3>
           <p>Editing documentary-style story videos, pacing, audio synchronization, and visual effects (Movavi).</p>
+        </div>
+
+        <div class="glass-card skill-card reveal-item">
+          <div class="skill-icon">
+            <i class="fa-solid fa-microchip"></i>
+          </div>
+          <h3>Sensor Integration & Microcontroller Programming</h3>
+          <p>Working with ESP32, ultrasonic sensors, buzzers, and LCDs for real-time monitoring and alerts. Hands-on embedded systems and IoT hardware expertise.</p>
+        </div>
+
+        <div class="glass-card skill-card reveal-item reveal-delay-1">
+          <div class="skill-icon">
+            <i class="fa-solid fa-cubes"></i>
+          </div>
+          <h3>IoT–Mobile App & Blockchain Integration</h3>
+          <p>Building Flutter apps for real-time IoT dashboards and emergency alerts. Secure event logging using blockchain technology for transparency and reliability.</p>
         </div>
       </div>
     </div>
@@ -706,10 +722,25 @@
     ];
 
     // Initialize or migrate certificates if placeholders exist or need update
-    const existingCerts = localStorage.getItem('portfolio_certificates');
-    if (!existingCerts || existingCerts.includes('placehold.co') || !existingCerts.includes('ct3.png') || existingCerts.includes('Cipher Schools')) {
-      localStorage.setItem('portfolio_certificates', JSON.stringify(defaultCertificates));
-    }
+    (function() {
+      const existingCerts = localStorage.getItem('portfolio_certificates');
+      let shouldReset = false;
+      if (!existingCerts) {
+        shouldReset = true;
+      } else {
+        try {
+          const parsed = JSON.parse(existingCerts);
+          // Reset if any cert image is a data URL (broken from old upload) or old placeholders exist
+          const hasBrokenImage = parsed.some(c => c.image && (c.image.startsWith('data:') || c.image.includes('placehold.co')));
+          const missingCt3 = !parsed.some(c => c.image === 'ct3.png');
+          const hasOldIssuer = existingCerts.includes('Cipher Schools');
+          if (hasBrokenImage || missingCt3 || hasOldIssuer) shouldReset = true;
+        } catch(e) { shouldReset = true; }
+      }
+      if (shouldReset) {
+        localStorage.setItem('portfolio_certificates', JSON.stringify(defaultCertificates));
+      }
+    })();
 
     function renderCertificates(){
       const certificates = JSON.parse(localStorage.getItem('portfolio_certificates')) || [];
