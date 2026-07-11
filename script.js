@@ -5,9 +5,39 @@
 
 document.addEventListener('DOMContentLoaded', () => {
   // 1. Basic Console Log
-  console.log('%c🚀 Abdul Haseeb Portfolio Loaded Successfully!', 'color: #38bdf8; font-size: 1.25rem; font-weight: bold; text-shadow: 0 0 10px rgba(56, 189, 248, 0.4);');
-  console.log('%c👨‍💻 Mobile App & Flutter Developer | Wahcantt, Pakistan', 'color: #94a3b8; font-size: 1rem;');
-  console.log('%c✨ Image Fullscreen Lightbox Enabled.', 'color: #3b82f6; font-size: 0.9rem;');
+  console.log('%c🚀 Abdul Haseeb Portfolio Loaded Successfully!', 'color: #6d5ef5; font-size: 1.25rem; font-weight: bold; text-shadow: 0 0 10px rgba(109,94,245,0.5);');
+  console.log('%c👨‍💻 Mobile App & Flutter Developer | Wahcantt, Pakistan', 'color: #9d91f8; font-size: 1rem;');
+  console.log('%c✨ Premium Portfolio v3.0 — Elite Redesign Active', 'color: #00d4ff; font-size: 0.9rem;');
+
+  // 1.5 Cursor Spotlight Effect
+  const spotlight = document.getElementById('cursor-spotlight');
+  if (spotlight) {
+    let rafId = null;
+    let cx = window.innerWidth / 2, cy = window.innerHeight / 2;
+    document.addEventListener('mousemove', (e) => {
+      cx = e.clientX;
+      cy = e.clientY;
+      if (!rafId) {
+        rafId = requestAnimationFrame(() => {
+          spotlight.style.left = cx + 'px';
+          spotlight.style.top  = cy + 'px';
+          rafId = null;
+        });
+      }
+    });
+  }
+
+  // 1.6 Header Scroll State
+  const header = document.getElementById('header');
+  if (header) {
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 40) {
+        header.classList.add('scrolled');
+      } else {
+        header.classList.remove('scrolled');
+      }
+    }, { passive: true });
+  }
 
   // 2. Dynamic Footer Year
   const yearSpan = document.getElementById('current-year');
@@ -376,7 +406,8 @@ document.addEventListener('DOMContentLoaded', () => {
       location: "Wahcantt, Islamabad, Pakistan",
       linkedin: "https://www.linkedin.com/in/abdul-haseebworks/",
       socials: [
-        { platform: "LinkedIn", icon: "fa-brands fa-linkedin-in", url: "https://www.linkedin.com/in/abdul-haseebworks/" }
+        { platform: "LinkedIn", icon: "fa-brands fa-linkedin-in", url: "https://www.linkedin.com/in/abdul-haseebworks/" },
+        { platform: "Instagram", icon: "fa-brands fa-instagram", url: "https://www.instagram.com/_soft.link?igsh=MXVseDV3Y3VmcXJneg%3D%3D&utm_source=qr" }
       ]
     }
   };
@@ -421,6 +452,14 @@ document.addEventListener('DOMContentLoaded', () => {
         { platform: "LinkedIn", icon: "fa-brands fa-linkedin-in", url: data.contact.linkedin || "https://www.linkedin.com/in/abdul-haseebworks/" }
       ];
       localStorage.setItem(DATA_STORAGE_KEY, JSON.stringify(data));
+    }
+    // Migration: ensure Instagram is in contact.socials
+    if (data.contact && data.contact.socials) {
+      const hasInstagram = data.contact.socials.some(s => s.platform === "Instagram");
+      if (!hasInstagram) {
+        data.contact.socials.push({ platform: "Instagram", icon: "fa-brands fa-instagram", url: "https://www.instagram.com/_soft.link?igsh=MXVseDV3Y3VmcXJneg%3D%3D&utm_source=qr" });
+        localStorage.setItem(DATA_STORAGE_KEY, JSON.stringify(data));
+      }
     }
     // Migration: ensure hero.avatar exists
     if (!data.hero.avatar) {
