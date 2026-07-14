@@ -260,6 +260,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const DEFAULT_PROJECTS = [
     {
+      title: "Five Guys Kitchen POS Software",
+      date: "2026",
+      desc: "Developed a modern restaurant POS system with:<br>• Smart dashboard for sales & profit tracking<br>• Quick order management with discounts & tax<br>• Inventory & expense control<br>• Secure multi-payment options with instant receipts<br><br>All-in-one solution built to boost efficiency and growth.",
+      images: ["pos-cover.png", "pos-1.png", "pos-2.png"],
+      tags: ["POS System", "Dashboard", "Inventory Management"]
+    },
+    {
       title: "Flutter E-Commerce",
       date: "1 APR 2026 - 30 APR 2026",
       desc: "A mobile application designed to make online shopping simple and user-friendly. Includes secure login, product category browsing, filter searches, shopping cart, and order tracking. Integrates payment systems and real-time notifications.",
@@ -423,10 +430,11 @@ document.addEventListener('DOMContentLoaded', () => {
       return [...DEFAULT_PROJECTS];
     }
     let parsed = JSON.parse(stored);
-    // Migration: if NDSA or WLD projects are missing, reset to defaults
+    // Migration: if POS, NDSA or WLD projects are missing, reset to defaults
+    const hasPOS = parsed.some(p => p.images && p.images.includes('pos-cover.png'));
     const hasNDSA = parsed.some(p => p.images && p.images.includes('NDSA.jpeg'));
     const hasWLD = parsed.some(p => p.images && p.images.includes('WLD.jpeg'));
-    if (!hasNDSA || !hasWLD) {
+    if (!hasPOS || !hasNDSA || !hasWLD) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_PROJECTS));
       return [...DEFAULT_PROJECTS];
     }
@@ -529,18 +537,58 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ---------- Home Page: Render first 3 projects ----------
+  let currentProjectOffset = 0;
+  let homeProjectsInterval;
 
   const homeGrid = document.getElementById('home-projects-grid');
   if (homeGrid) {
     renderHomeProjects();
+    startHomeProjectsCarousel();
   }
 
-  function renderHomeProjects() {
+  function renderHomeProjects(animate = false) {
     if (!homeGrid) return;
     const projects = getProjects();
-    const first3 = projects.slice(0, 3);
-    homeGrid.innerHTML = first3.map((proj, i) => buildProjectCardHTML(proj, i, false)).join('');
-    observeRevealItems();
+    if (projects.length === 0) return;
+    
+    const displayedProjects = [];
+    for (let i = 0; i < 3; i++) {
+      displayedProjects.push(projects[(currentProjectOffset + i) % projects.length]);
+    }
+
+    if (animate) {
+      const cards = homeGrid.querySelectorAll('.project-card');
+      cards.forEach(card => {
+        card.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+        card.classList.remove('revealed');
+      });
+      
+      setTimeout(() => {
+        homeGrid.innerHTML = displayedProjects.map((proj, i) => buildProjectCardHTML(proj, i, false)).join('');
+        setTimeout(() => {
+          const newCards = homeGrid.querySelectorAll('.project-card');
+          newCards.forEach(card => card.classList.add('revealed'));
+        }, 50);
+      }, 400);
+    } else {
+      homeGrid.innerHTML = displayedProjects.map((proj, i) => buildProjectCardHTML(proj, i, false)).join('');
+      observeRevealItems();
+    }
+  }
+
+  function startHomeProjectsCarousel() {
+    const projects = getProjects();
+    if (projects.length <= 3) return;
+    
+    if (homeProjectsInterval) clearInterval(homeProjectsInterval);
+    
+    homeProjectsInterval = setInterval(() => {
+      // Pause carousel if user is hovering over the projects section
+      if (homeGrid.matches(':hover')) return;
+      
+      currentProjectOffset = (currentProjectOffset + 1) % projects.length;
+      renderHomeProjects(true);
+    }, 5000);
   }
 
   // ---------- Projects Page: Render all projects (Read-only on public page) ----------
